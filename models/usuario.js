@@ -3,23 +3,48 @@ var uniqueValidator = require('mongoose-unique-validator'); // Plugin para menss
 
 var Schema = mongoose.Schema;
 
+
 var rolesValidos = {
     values: ['ADMIN_ROLE', 'USER_ROLE'],
     message: '{VALUE} no es un rol valido'
 };
 
+
+var listaDeDeseosSchema = new Schema({
+
+    nombre: { type: String, required: [true, 'Es obligatorio introducir el nombre'] },
+    __v: { type: Number, select: false },
+    producto: [{ type: Schema.Types.ObjectId, ref: 'Producto' }]
+
+});
+
+
+var criticasSchema = new Schema({
+
+    nombre: { type: String, required: false },
+    descripcion: { type: String, required: false },
+    nota: { type: Number, required: [true, 'Es obligatorio votar el producto'] },
+    __v: { type: Number, select: false },
+    producto: { type: Schema.Types.ObjectId, ref: 'Producto', required: [true, 'Es obligatorio introducir un producto'] }
+
+});
+
 var usuarioSchema = new Schema({
 
     nombre: { type: String, required: [true, 'Es obligatorio introducir el nombre'] },
-    edad: { type: Number, required: [true, 'Es obligatorio introducir la edad'] },
-    genero: { type: Boolean, required: [true, 'Es obligatorio introducir el genero'] },
-    ciudad: { type: String, required: [true, 'Es obligatorio introducir la ciudad'] },
-    pais: { type: String, required: [true, 'Es obligatorio introducir el pais'] },
+    edad: { type: String },
+    genero: { type: Boolean },
+    ciudad: { type: String },
+    pais: { type: String },
     email: { type: String, unique: true, required: [true, 'Es obligatorio introducir el email'] },
     password: { type: String, required: [true, 'Es obligatorio introducir la contraseña'] },
     img: { type: String, required: false },
     role: { type: String, required: true, default: 'USER_ROLE', enum: rolesValidos },
-    catRecomendar: [{ type: Schema.Types.ObjectId, ref: 'SubCategoria' }]
+    catRecomendar: [{ type: Schema.Types.ObjectId, ref: 'SubCategoria' }],
+    listasDeDeseos: [listaDeDeseosSchema],
+    criticas: [criticasSchema],
+    __v: { type: Number, select: false },
+    google: { type: Boolean, default: false }
 
 });
 

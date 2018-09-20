@@ -5,8 +5,8 @@ var Schema = mongoose.Schema;
 
 var subcategoriaSchema = new Schema({
 
-    nombre: { type: String, unique: true, required: [true, 'Es obligatorio introducir el nombre'] },
-    categoria: [{ type: Schema.Types.ObjectId, ref: 'Categoria', required: [true, 'Es obligatorio introducir una categoria'] }]
+    nombre: { type: String, required: [true, 'Es obligatorio introducir el nombre'], unique: false },
+    categoria: { type: Schema.Types.ObjectId, ref: 'Categoria', required: [true, 'Es obligatorio introducir una categoria'] }
 
 });
 

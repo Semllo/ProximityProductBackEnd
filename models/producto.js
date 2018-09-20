@@ -6,11 +6,15 @@ var Schema = mongoose.Schema;
 
 var productoSchema = new Schema({
 
-    nombre: { type: String, unique: true, required: [true, 'Es obligatorio introducir el nombre'] },
-    precio: { type: Number, required: [true, 'Es obligatorio introducir el precio'] },
+    nombre: { type: String },
+    descripcion: { type: String },
+    precio: { type: Number },
+    notamedia: { type: Number, required: false },
+    popularidad: { type: Number, required: false },
     fecha: { type: Date, default: Date.now },
     img: { type: String, required: false },
-    subcategoria: [{ type: Schema.Types.ObjectId, ref: 'SubCategoria' }]
+    __v: { type: Number, select: false },
+    subcategoria: { type: Schema.Types.ObjectId, ref: 'SubCategoria', required: [true, 'Es obligatorio introducir la categoria'] }
 
 });
 

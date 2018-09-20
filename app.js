@@ -6,6 +6,14 @@ var bodyParser = require('body-parser');
 // Inicializar variables
 var app = express();
 
+//CORS
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+    next();
+});
+
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -21,7 +29,10 @@ var productosRoutes = require('./routes/productos');
 var listaDeDeseosRoutes = require('./routes/listadedeseos');
 var criticasRoutes = require('./routes/criticas');
 var busquedaRoutes = require('./routes/busquedas');
-//var imagenesRoutes = require('./routes/imagenes');
+var indicadoresRoutes = require('./routes/indicadores');
+var imagenesRoutes = require('./routes/imagenes');
+var uploadsRoutes = require('./routes/uploads');
+var kmeansRoutes = require('./routes/k-means');
 
 // Conexión BBDD
 mongoose.connection.openUri('mongodb://localhost:27017/ProximityProduct', { useNewUrlParser: true }, (err, res) => {
@@ -32,7 +43,7 @@ mongoose.connection.openUri('mongodb://localhost:27017/ProximityProduct', { useN
 
     })
     //
-    // Rutas
+    // Rutas 
 
 //app.use('/img', imagenesRoutes);
 app.use('/busqueda', busquedaRoutes);
@@ -43,6 +54,10 @@ app.use('/categoria', categoriaRoutes);
 app.use('/subcategoria', subcategoriaRoutes);
 app.use('/producto', productosRoutes);
 app.use('/critica', criticasRoutes);
+app.use('/indicadores', indicadoresRoutes);
+app.use('/img', imagenesRoutes);
+app.use('/upload', uploadsRoutes);
+app.use('/kmeans', kmeansRoutes);
 
 app.use('/', appRoutes);
 

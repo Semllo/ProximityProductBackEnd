@@ -7,31 +7,43 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
+var Usuario = require('../models/usuario');
 var ListaDeDeseos = require('../models/listadedeseos');
 
 // =========================================================
-// Obtener todos los Listadedeseos 
+// Obtener todos las Lista de deseos 
 // =========================================================
-app.get('/', (req, res, next) => {
 
+// Se pueden ver en usuarios, esto se podria borrar
+app.get('/:id', (req, res, next) => {
+
+    var id = req.params.id;
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    ListaDeDeseos.find({}).populate('usuario', 'nombre edad genero ciudad pais email img').populate('producto').skip(desde).limit(5).exec((err, listadedeseos) => {
+    Usuario.findById(id).populate('usuario', 'nombre edad genero ciudad pais email img').populate('producto').skip(desde).limit(5).exec((err, usuario) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error cargando Listadedeseos en bbdd',
+                mensaje: 'Error cargando Listadedeseos en bd',
                 errors: err
             });
         }
 
-        ListaDeDeseos.count({}, (err, conteo) => {
+        if (!usuario) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No se encuentra el usuario en la BD',
+                errors: err
+            });
+        }
+
+        Usuario.count({}, (err, conteo) => {
 
             res.status(200).json({
                 ok: true,
-                listadedeseos: listadedeseos,
+                listadedeseos: usuario.listasDeDeseos,
                 total: conteo
             });
         })
@@ -43,78 +55,44 @@ app.get('/', (req, res, next) => {
 
 
 // =========================================================
-// Crear un nuevo listadedeseos
+// Crear una nuevo lista de deseos
 // =========================================================
-app.post('/', (req, res) => {
 
-    var body = req.body;
-
-    var listadedeseos = new ListaDeDeseos({
-
-        nombre: body.nombre,
-        usuario: body.usuario,
-        producto: body.producto,
-
-
-    })
-
-    listadedeseos.save((err, listadedeseosGuardado) => {
-
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'Error al crear listadedeseos',
-                errors: err
-            });
-        }
-
-
-
-        res.status(201).json({
-
-            ok: true,
-            listadedeseos: listadedeseosGuardado
-
-        });
-    });
-});
-
-
-
-// =========================================================
-// Actualizar listadedeseos
-// =========================================================
-app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
+app.post('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    ListaDeDeseos.findById(id, (err, listadedeseos) => {
+    Usuario.findById(id, (err, usuario) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar listadedeseos',
+                mensaje: 'Error al buscar usuario',
                 errors: err
             });
         }
 
-        if (!listadedeseos) {
+        if (!usuario) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El listadedeseos con el id' + id + 'no existe',
-                errors: { message: 'No exite un listadedeseos con tal ID' }
+                mensaje: 'El usuario con el id' + id + 'no existe',
+                errors: { message: 'No exite un usuario con tal ID' }
             });
 
         }
 
-        listadedeseos.nombre = body.nombre;
-        listadedeseos.usuario = body.usuario;
-        listadedeseos.producto = body.producto;
+        var listadedeseos = new ListaDeDeseos({
+
+            nombre: body.nombre,
+            producto: body.producto,
 
 
+        })
 
-        listadedeseos.save((err, listadedeseosGuardado) => {
+        usuario.listasDeDeseos[usuario.listasDeDeseos.length] = listadedeseos;
+
+        usuario.save((err, listadedeseosGuardado) => {
 
             if (err) {
                 return res.status(400).json({
@@ -124,7 +102,89 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
                 });
             }
 
-            listadedeseosGuardado.password = ':)';
+
+            res.status(200).json({
+                ok: true,
+                listadedeseos: listadedeseosGuardado
+            })
+
+
+
+        })
+
+    });
+
+
+});
+
+
+
+// =========================================================
+// Actualizr una  lista de deseos
+// =========================================================
+
+app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
+
+    var idUser = req.params.idUser;
+    var idLista = req.params.idLista;
+    var body = req.body;
+
+    Usuario.findById({ _id: idUser }, (err, usuario) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar usuario',
+                errors: err
+            });
+        }
+
+        if (!usuario) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El usuario con el id' + id + 'no existe',
+                errors: { message: 'No exite un usuario con tal ID' }
+            });
+
+        }
+
+
+
+
+
+
+        var posicion = 0;
+        for (var i = 0; i < usuario.listasDeDeseos.length; i++) {
+
+            if (usuario.listasDeDeseos[i]._id == idLista)
+                posicion = i;
+
+        }
+
+
+        var listadedeseos = new ListaDeDeseos({
+
+
+            nombre: body.nombre,
+            producto: body.producto,
+
+
+        })
+
+        usuario.listasDeDeseos[posicion] = listadedeseos;
+
+
+
+
+        usuario.save((err, listadedeseosGuardado) => {
+
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar listadedeseos',
+                    errors: err
+                });
+            }
 
 
             res.status(200).json({
@@ -145,11 +205,12 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 // =========================================================
 // Borrar un listadedeseos por id
 // =========================================================
-app.delete('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
+app.delete('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
-    var id = req.params.id;
+    var idUser = req.params.idUser;
+    var idLista = req.params.idLista;
 
-    ListaDeDeseos.findByIdAndRemove(id, (err, listadedeseosBorrado) => {
+    Usuario.findById(idUser, (err, listadedeseosBorrado) => {
 
         if (err) {
             return res.status(500).json({
@@ -167,14 +228,20 @@ app.delete('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
             });
         }
 
-        res.status(200).json({
-            ok: true,
-            listadedeseos: listadedeseosBorrado
-        })
+        listadedeseosBorrado.listasDeDeseos.id(idLista).remove();
+
+        listadedeseosBorrado.save((req, borrado) => {
+
+            res.status(200).json({
+                ok: true,
+                listadedeseos: borrado
+            })
+        });
 
 
     })
 
 });
+
 
 module.exports = app;

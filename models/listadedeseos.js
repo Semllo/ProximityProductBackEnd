@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 var listaDeDeseosSchema = new Schema({
 
     nombre: { type: String, required: [true, 'Es obligatorio introducir el nombre'] },
-    usuario: { type: Schema.Types.ObjectId, ref: 'Usuario', required: [true, 'Es obligatorio introducir un usuario'] },
+    __v: { type: Number, select: false },
     producto: [{ type: Schema.Types.ObjectId, ref: 'Producto' }]
 
 });

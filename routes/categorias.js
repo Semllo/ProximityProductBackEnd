@@ -17,7 +17,7 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Categoria.find({}).skip(desde).limit(5).exec((err, categorias) => {
+    Categoria.find({}).exec((err, categorias) => {
 
         if (err) {
             return res.status(500).json({

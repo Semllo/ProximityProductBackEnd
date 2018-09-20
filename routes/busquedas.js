@@ -13,7 +13,7 @@ var Critica = require('../models/critica');
 // Rutas
 
 // =========================================================
-// Obtener coincidencias en coleccion  
+// Buscar por colección 
 // =========================================================
 app.get('/coleccion/:tabla/:busqueda', (req, res, next) => {
 
@@ -78,7 +78,7 @@ app.get('/coleccion/:tabla/:busqueda', (req, res, next) => {
 });
 
 // =========================================================
-// Obtener todas las coincidencias
+// Buscar en toda la bd
 // =========================================================
 app.get('/bd/:busqueda', (req, res, next) => {
 
@@ -139,7 +139,6 @@ function buscarCategorias(busqueda, regex, desde) {
         })
 
         Categoria.find({ nombre: regex })
-            .skip(desde).limit(5)
             .exec((err, categorias) => {
 
                 if (err) {
@@ -175,7 +174,6 @@ function buscarCriticas(busqueda, regex, desde) {
         })
 
         Critica.find({ nombre: regex })
-            .skip(desde).limit(5)
             .populate('usuario', 'nombre edad genero ciudad pais email img')
             .exec((err, criticas) => {
 
@@ -212,7 +210,6 @@ function buscarListasDeDeseos(busqueda, regex, desde) {
         })
 
         ListaDeDeseos.find({ nombre: regex })
-            .skip(desde).limit(5)
             .populate('usuario', 'nombre edad genero ciudad pais email img').populate('producto')
             .exec((err, listaDeDeseos) => {
 
@@ -248,7 +245,6 @@ function buscarProducto(busqueda, regex, desde) {
         })
 
         Producto.find({ nombre: regex })
-            .skip(desde).limit(5)
             .populate('subcategoria')
             .exec((err, productos) => {
 
@@ -284,7 +280,6 @@ function buscarSubCategoria(busqueda, regex, desde) {
         })
 
         SubCategoria.find({ nombre: regex })
-            .skip(desde).limit(5)
             .populate('categoria')
             .exec((err, subCategorias) => {
 
@@ -313,16 +308,8 @@ function buscarUsuarios(busqueda, regex, desde) {
 
     return new Promise((resolve, reject) => {
 
-        var registros_totales;
-
-        Usuario.count({}, (err, conteo) => {
-
-            registros_totales = conteo;
-
-        })
 
         Usuario.find({ nombre: regex })
-            .skip(desde).limit(5)
             .populate('catRecomendar')
             .exec((err, usuarios) => {
 
@@ -332,7 +319,6 @@ function buscarUsuarios(busqueda, regex, desde) {
 
                 } else {
 
-                    usuarios.push({ registros_totales: registros_totales });
                     resolve(usuarios);
 
                 }

@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 
 var categoriaSchema = new Schema({
 
+    __v: { type: Number, select: false },
     nombre: { type: String, unique: true, required: [true, 'Es obligatorio introducir el nombre'] }
 
 });

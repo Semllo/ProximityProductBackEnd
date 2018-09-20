@@ -17,7 +17,7 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Usuario.find({}).populate('catRecomendar').skip(desde).limit(5).exec((err, usuarios) => {
+    Usuario.find({}).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).skip(desde).limit(5).exec((err, usuarios) => {
 
         if (err) {
             return res.status(500).json({
@@ -60,7 +60,8 @@ app.post('/', (req, res) => {
         password: bcrypt.hashSync(body.password, 10), // Contraseña encriptada 
         img: body.img,
         role: body.role,
-        catRecomendar: body.catRecomendar
+        catRecomendar: body.catRecomendar,
+
 
     })
 
@@ -90,12 +91,12 @@ app.post('/', (req, res) => {
 // =========================================================
 // Actualizar usuario
 // =========================================================
-app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
+app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById(id, (err, usuario) => {
+    Usuario.findById(id).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).exec((err, usuario) => {
 
         if (err) {
             return res.status(500).json({
@@ -123,13 +124,17 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
         usuario.role = body.role;
         usuario.img = body.img;
         usuario.catRecomendar = body.catRecomendar;
+        usuario.criticas = body.criticas;
+        usuario.listasDeDeseos = body.listasDeDeseos;
+
+        console.log(usuario);
 
         usuario.save((err, usuarioGuardado) => {
 
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al actualizar usuario',
+                    mensaje: 'Error al actualizar el usuario ' + usuarioGuardado,
                     errors: err
                 });
             }
@@ -155,7 +160,7 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 // =========================================================
 // Borrar un usuario por id
 // =========================================================
-app.delete('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
+app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
 

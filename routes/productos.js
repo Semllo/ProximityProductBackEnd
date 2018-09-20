@@ -17,7 +17,7 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Producto.find({}).populate('subcategoria').skip(desde).limit(5).exec((err, productos) => {
+    Producto.find({}).populate('subcategoria').populate({ path: 'subcategoria', populate: { path: 'categoria' } }).skip(desde).limit(5).exec((err, productos) => {
 
         if (err) {
             return res.status(500).json({
@@ -43,6 +43,46 @@ app.get('/', (req, res, next) => {
 
 
 // =========================================================
+// Obtener producto por id 
+// =========================================================
+app.get('/:id', (req, res, next) => {
+
+    var id = req.params.id;
+
+    Producto.findById(id).populate('subcategoria').populate({ path: 'subcategoria', populate: { path: 'categoria' } }).exec((err, productos) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error cargando productos en bbdd',
+                errors: err
+            });
+        }
+
+        if (!productos) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El producto con el id' + id + 'no existe',
+                errors: { message: 'No exite un producto con tal ID' }
+            });
+
+        }
+
+        Producto.count({}, (err, conteo) => {
+
+            res.status(200).json({
+                ok: true,
+                productos: productos,
+                total: conteo
+            });
+        })
+
+    })
+
+
+});
+
+// =========================================================
 // Crear un nuevo producto
 // =========================================================
 app.post('/', (req, res) => {
@@ -53,6 +93,7 @@ app.post('/', (req, res) => {
 
         nombre: body.nombre,
         precio: body.precio,
+        descripcion: body.descripcion,
         imagen: body.imagen,
         subcategoria: body.subcategoria,
 
@@ -111,6 +152,7 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
         producto.nombre = body.nombre;
         producto.precio = body.precio;
         producto.imagen = body.imagen;
+        producto.descripcion = body.descripcion;
         producto.subcategoria = body.subcategoria;
 
 
@@ -174,6 +216,45 @@ app.delete('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
 
     })
+
+});
+
+
+
+// =========================================================
+// Mostrar productos por categoria
+// =========================================================
+
+app.get('/:subcategoria', (req, res, next) => {
+
+    var subcategorias = req.params.subcategoria;
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
+
+    Producto.find({ subcategoria: subcategorias }).populate('subcategoria').skip(desde).limit(5).exec((err, productos) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error cargando productos en bbdd',
+                errors: err
+            });
+        }
+
+
+        Producto.count({}, (err, conteo) => {
+
+            res.status(200).json({
+                ok: true,
+                productos: productos,
+                total: conteo
+            });
+        })
+
+    })
+
 
 });
 

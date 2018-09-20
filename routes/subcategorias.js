@@ -3,6 +3,7 @@ var bcrypt = require('bcryptjs'); // Encripta la contraseña
 //var jwt = require('jsonwebtoken'); // Libreria para crear los token
 var mdAutenticacion = require('../middlewares/autenticacion');
 //var SEED = require('../config/config').SEED;
+var mongoose = require('mongoose');
 
 
 var app = express();
@@ -52,10 +53,12 @@ app.post('/', (req, res) => {
     var subcategoria = new subCategoria({
 
         nombre: body.nombre,
+        _id: mongoose.Types.ObjectId(),
         categoria: body.categoria
 
     })
 
+    console.log(subcategoria);
     subcategoria.save((err, subcategoriaGuardado) => {
 
         if (err) {
