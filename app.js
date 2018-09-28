@@ -35,7 +35,7 @@ var uploadsRoutes = require('./routes/uploads');
 var kmeansRoutes = require('./routes/k-means');
 
 // Conexión BBDD
-mongoose.connection.openUri('mongodb://localhost:27017/ProximityProduct', { useNewUrlParser: true }, (err, res) => {
+mongoose.connection.openUri('mongodb://marsemll:pa$$w0rdPrimento1992@ds215633.mlab.com:15633/proximityproduct', { useNewUrlParser: true }, (err, res) => { // mongodb://localhost:27017/ProximityProduct
 
         if (err) throw err;
 
