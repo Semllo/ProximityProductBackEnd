@@ -19,10 +19,10 @@ var Producto = require('../models/producto');
 app.get('/:id', (req, res, next) => {
 
     var id = req.params.id;
-    var desde = req.query.desde || 0;
-    desde = Number(desde);
+    // var desde = req.query.desde || 0;
+    // desde = Number(desde);
 
-    Usuario.findById(id).populate('producto').skip(desde).limit(5).exec((err, usuario) => {
+    Usuario.findById(id).populate('criticas.producto') /*.skip(desde).limit(5).*/ .exec((err, usuario) => {
 
         if (err) {
             return res.status(500).json({
@@ -45,7 +45,7 @@ app.get('/:id', (req, res, next) => {
 
             res.status(200).json({
                 ok: true,
-                listadedeseos: usuario.criticas,
+                criticas: usuario.criticas,
                 total: conteo
             });
         })
@@ -65,7 +65,7 @@ app.post('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById(id, (err, usuario) => {
+    Usuario.findById(id).populate({ path: 'criticas.producto' }).populate({ path: 'criticas', populate: { path: 'producto' } }).populate({ path: 'listasDeDeseos.producto' }).exec((err, usuario) => {
 
         if (err) {
             return res.status(500).json({
@@ -94,6 +94,25 @@ app.post('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
         })
 
+        console.log(usuario.criticas);
+
+        for (let i = 0; i < usuario.criticas.length; i++) {
+
+            if (usuario.criticas[i] != undefined && usuario.criticas[i].producto != null) {
+                console.log(usuario.criticas[i].producto._id + ' == ' + criticas.producto);
+                if ('' + usuario.criticas[i].producto._id == criticas.producto + '') {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Error al actualizar criticas, el producto ya esta introducido',
+                        errors: err
+                    });
+                }
+            }
+
+        }
+
+
+
         usuario.criticas[usuario.criticas.length] = criticas;
 
         usuario.save((err, criticasGuardadas) => {
@@ -102,6 +121,7 @@ app.post('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
                 return res.status(400).json({
                     ok: false,
                     mensaje: 'Error al actualizar criticas',
+                    criticasGuardadas: criticasGuardadas,
                     errors: err
                 });
             }
@@ -125,7 +145,7 @@ app.post('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
 
 // =========================================================
-// Actualizr una  lista de deseos
+// Actualizar critica
 // =========================================================
 
 app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
@@ -231,6 +251,14 @@ app.delete('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) 
             });
         }
 
+        if (!criticasBorrado.criticas) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No existen criticas con dicho id',
+                errors: err
+            });
+        }
+
         criticasBorrado.criticas.id(idLista).remove();
 
         criticasBorrado.save((req, borrado) => {
@@ -255,6 +283,7 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
     var id = req.params.id;
 
+    console.log(id);
     Usuario.find({ 'criticas.producto': id }).exec((err, usuarios) => {
 
 
@@ -284,6 +313,7 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
 
 
                 if (usuarios[i].criticas[j].producto == id) {
+                    console.log(usuarios[i].criticas[j].nota);
                     sum += parseInt(usuarios[i].criticas[j].nota, 10);
 
 
@@ -292,10 +322,14 @@ app.put('/:id' /*, mdAutenticacion.verificaToken*/ , (req, res) => {
             }
         }
 
-        var avg = sum / usuarios.length;
+        console.log(sum);
+        var avg = 0;
+        if (sum !== 0) {
+            var avg = sum / usuarios.length;
+        }
         var popularidad = usuarios.length;
 
-        Producto.findById(id, (err, productos) => {
+        Producto.findById(id).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).exec((err, productos) => {
 
             if (err) {
                 return res.status(500).json({

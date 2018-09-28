@@ -129,7 +129,7 @@ app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => 
     var idLista = req.params.idLista;
     var body = req.body;
 
-    Usuario.findById({ _id: idUser }, (err, usuario) => {
+    Usuario.findById({ _id: idUser }).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos', populate: { path: 'producto' } }).populate({ path: 'listasDeDeseos.producto' }).exec((err, usuarios) => {
 
         if (err) {
             return res.status(500).json({
@@ -139,7 +139,7 @@ app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => 
             });
         }
 
-        if (!usuario) {
+        if (!usuarios) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'El usuario con el id' + id + 'no existe',
@@ -154,9 +154,9 @@ app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => 
 
 
         var posicion = 0;
-        for (var i = 0; i < usuario.listasDeDeseos.length; i++) {
+        for (var i = 0; i < usuarios.listasDeDeseos.length; i++) {
 
-            if (usuario.listasDeDeseos[i]._id == idLista)
+            if (usuarios.listasDeDeseos[i]._id == idLista)
                 posicion = i;
 
         }
@@ -171,12 +171,12 @@ app.put('/:idUser/:idLista' /*, mdAutenticacion.verificaToken*/ , (req, res) => 
 
         })
 
-        usuario.listasDeDeseos[posicion] = listadedeseos;
+        usuarios.listasDeDeseos[posicion] = listadedeseos;
 
 
 
 
-        usuario.save((err, listadedeseosGuardado) => {
+        usuarios.save((err, listadedeseosGuardado) => {
 
             if (err) {
                 return res.status(400).json({

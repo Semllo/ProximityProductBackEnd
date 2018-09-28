@@ -25,7 +25,7 @@ var criticasSchema = new Schema({
     descripcion: { type: String, required: false },
     nota: { type: Number, required: [true, 'Es obligatorio votar el producto'] },
     __v: { type: Number, select: false },
-    producto: { type: Schema.Types.ObjectId, ref: 'Producto', required: [true, 'Es obligatorio introducir un producto'] }
+    producto: { type: Schema.Types.ObjectId, ref: 'Producto' }
 
 });
 

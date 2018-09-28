@@ -10,7 +10,7 @@ var app = express();
 var Usuario = require('../models/usuario');
 
 // =========================================================
-// Obtener todos los usuarios 
+// Obtener 5 usuarios 
 // =========================================================
 app.get('/', (req, res, next) => {
 
@@ -41,7 +41,68 @@ app.get('/', (req, res, next) => {
 
 });
 
+// =========================================================
+// Obtener todos los usuarios 
+// =========================================================
+app.get('/usuarios', (req, res, next) => {
 
+
+    Usuario.find({}).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).exec((err, usuarios) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error cargando usuarios en bbdd',
+                errors: err
+            });
+        }
+
+        Usuario.count({}, (err, conteo) => {
+
+            res.status(200).json({
+                ok: true,
+                usuarios: usuarios,
+                total: conteo
+            });
+        })
+
+    })
+
+
+});
+
+
+
+// =========================================================
+// Obtener todos los usuarios 
+// =========================================================
+app.get('/:id', (req, res, next) => {
+
+
+    var id = req.params.id;
+    Usuario.findById(id).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).exec((err, usuarios) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error cargando usuarios en bbdd',
+                errors: err
+            });
+        }
+
+        Usuario.count({}, (err, conteo) => {
+
+            res.status(200).json({
+                ok: true,
+                usuarios: usuarios,
+                total: conteo
+            });
+        })
+
+    })
+
+
+});
 // =========================================================
 // Crear un nuevo usuario
 // =========================================================
@@ -127,7 +188,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         usuario.criticas = body.criticas;
         usuario.listasDeDeseos = body.listasDeDeseos;
 
-        console.log(usuario);
+        // console.log(usuario);
 
         usuario.save((err, usuarioGuardado) => {
 
