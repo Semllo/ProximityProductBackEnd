@@ -14,7 +14,9 @@ var Producto = require('../models/producto');
 app.get('/:orden/:propiedad', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var hasta = req.query.hasta || 5;
     desde = Number(desde);
+    hasta = Number(hasta);
 
 
     var propiedad = req.params.propiedad;
@@ -102,6 +104,9 @@ function sortJSON1(data, key, orden) {
     return data.sort((a, b) => {
         var x = a[key],
             y = b[key];
+
+        if (x == undefined) { x = 0 }
+        if (y == undefined) { y = 0 }
 
         if (orden === 'asc') {
             return ((x < y) ? -1 : ((x > y) ? 1 : 0));

@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator'); // Plugin para menssaje de error por unicidad
+const criticasSchema = require('./critica').schema;
+const listaDeDeseosSchema = require('./listadedeseos').schema;
 
 var Schema = mongoose.Schema;
 
@@ -8,26 +10,6 @@ var rolesValidos = {
     values: ['ADMIN_ROLE', 'USER_ROLE'],
     message: '{VALUE} no es un rol valido'
 };
-
-
-var listaDeDeseosSchema = new Schema({
-
-    nombre: { type: String, required: [true, 'Es obligatorio introducir el nombre'] },
-    __v: { type: Number, select: false },
-    producto: [{ type: Schema.Types.ObjectId, ref: 'Producto' }]
-
-});
-
-
-var criticasSchema = new Schema({
-
-    nombre: { type: String, required: false },
-    descripcion: { type: String, required: false },
-    nota: { type: Number, required: [true, 'Es obligatorio votar el producto'] },
-    __v: { type: Number, select: false },
-    producto: { type: Schema.Types.ObjectId, ref: 'Producto' }
-
-});
 
 var usuarioSchema = new Schema({
 

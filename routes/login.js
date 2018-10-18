@@ -59,7 +59,8 @@ app.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB.id
+            id: usuarioDB.id,
+            menu: obtenerMenu(usuarioDB.role)
 
         });
 
@@ -143,7 +144,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB.id
+                    id: usuarioDB.id,
+                    menu: obtenerMenu(usuarioDB.role)
 
                 });
 
@@ -176,7 +178,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB.id
+                    id: usuarioDB.id,
+                    menu: obtenerMenu(usuarioDB.role)
 
                 });
 
@@ -200,5 +203,47 @@ app.post('/google', async(req, res) => {
 
 })
 
+function obtenerMenu(ROLE) {
+
+    let menu = [
+        //    {titulo: 'Principal',
+        //    icono: 'mdi mdi-gauge',
+        //    submenu: [
+        //        { titulo: 'Principal', url: '/dashboard' },
+        //        { titulo: 'ProgressBar', url: '/progress' },
+        //        { titulo: 'Gráficas', url: '/graficas1' },
+        //        { titulo: 'Promesas', url: '/promesas' }
+        //    ]
+        //}
+        // ,
+        // {
+        //     titulo: 'Mantenimiento',
+        //     icono: 'mdi mdi-folder-lock-open',
+        //     submenu: [
+        //         { titulo: 'Usuarios', url: '/usuarios', icono: 'fas fa-users'  },
+        //         { titulo: 'Productos', url: '/productos', icono: 'fas fa-boxes' },
+        //         { titulo: 'Categorias', url: '/categorias', icono: 'fas fa-tasks' }
+        //     ]
+        // }
+    ];
+
+    // console.log(ROLE);
+    if (ROLE === 'ADMIN_ROLE') {
+
+        menu[0] = {
+            titulo: 'Mantenimiento',
+            icono: 'mdi mdi-folder-lock-open',
+            submenu: [
+                { titulo: 'Usuarios', url: '/usuarios', icono: 'fas fa-users' },
+                { titulo: 'Productos', url: '/productos', icono: 'fas fa-boxes' },
+                { titulo: 'Categorias', url: '/categorias', icono: 'fas fa-tasks' }
+            ]
+        };
+
+    }
+
+    console.log(menu);
+    return menu;
+}
 
 module.exports = app;

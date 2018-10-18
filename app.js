@@ -35,8 +35,7 @@ var uploadsRoutes = require('./routes/uploads');
 var kmeansRoutes = require('./routes/k-means');
 
 // Conexión BBDD
-mongoose.connection.openUri('mongodb://marsemll:pa$$w0rdPrimento1992@ds215633.mlab.com:15633/proximityproduct', { useNewUrlParser: true }, (err, res) => { // mongodb://localhost:27017/ProximityProduct 
-
+mongoose.connection.openUri('mongodb://localhost:27017/ProximityProduct', { useNewUrlParser: true }, (err, res) => { // mongodb://marsemll:pa$$w0rdPrimento1992@ds215633.mlab.com:15633/proximityproduct
         if (err) throw err;
 
         console.log('Base datos Mongo puerto 27017: \x1b[32m%s\x1b[0m', 'online');

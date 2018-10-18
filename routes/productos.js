@@ -15,9 +15,11 @@ var Producto = require('../models/producto');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var hasta = req.query.hasta || 5;
     desde = Number(desde);
+    hasta = Number(hasta);
 
-    Producto.find({}).populate('subcategoria').populate({ path: 'subcategoria', populate: { path: 'categoria' } }).skip(desde).limit(5).exec((err, productos) => {
+    Producto.find({}).populate('subcategoria').populate({ path: 'subcategoria', populate: { path: 'categoria' } }).skip(desde).limit(hasta).exec((err, productos) => {
 
         if (err) {
             return res.status(500).json({

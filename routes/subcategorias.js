@@ -16,9 +16,11 @@ var subCategoria = require('../models/subcategoria');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var hasta = req.query.hasta || 5;
     desde = Number(desde);
+    hasta = Number(hasta);
 
-    subCategoria.find({}).populate('categoria').skip(desde).limit(5).exec((err, subcategorias) => {
+    subCategoria.find({}).populate('categoria').skip(desde).limit(hasta).exec((err, subcategorias) => {
 
         if (err) {
             return res.status(500).json({

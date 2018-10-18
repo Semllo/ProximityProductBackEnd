@@ -254,7 +254,7 @@ function buscarProducto(busqueda, regex, desde) {
 
                 } else {
 
-                    productos.push({ registros_totales: registros_totales });
+                    // productos.push({ registros_totales: registros_totales });
                     resolve(productos);
 
                 }

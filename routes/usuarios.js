@@ -15,9 +15,11 @@ var Usuario = require('../models/usuario');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var hasta = req.query.hasta || 5;
     desde = Number(desde);
+    hasta = Number(hasta);
 
-    Usuario.find({}).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).skip(desde).limit(5).exec((err, usuarios) => {
+    Usuario.find({}).populate({ path: 'criticas.producto' }).populate({ path: 'listasDeDeseos.producto' }).skip(desde).limit(hasta).exec((err, usuarios) => {
 
         if (err) {
             return res.status(500).json({
@@ -152,7 +154,7 @@ app.post('/', (req, res) => {
 // =========================================================
 // Actualizar usuario
 // =========================================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE_AND_USER], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
